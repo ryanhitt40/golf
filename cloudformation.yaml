@@ -16,6 +16,14 @@ Resources:
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
 
+  GolfTrackerS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "golf-tracker-${AWS::AccountId}-${AWS::Region}"
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+
   GolfTrackerLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -52,7 +60,7 @@ Resources:
       Handler: index.lambda_handler
       Role: !GetAtt GolfTrackerLambdaRole.Arn
       Code:
-        S3Bucket: test-bucket-golf6543467798
+        S3Bucket: YOUR_CODE_S3_BUCKET
         S3Key: lambda_function.zip
       Environment:
         Variables:
@@ -83,3 +91,8 @@ Resources:
         Uri: !Sub
           - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations"
           - LambdaArn: !GetAtt GolfTrackerLambda.Arn
+
+Outputs:
+  GolfTrackerS3BucketName:
+    Description: "S3 bucket for hosting the golf tracker website"
+    Value: !Ref GolfTrackerS3Bucket
