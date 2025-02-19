@@ -16,20 +16,6 @@ Resources:
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
 
-  GolfTrackerLambdaS3Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub "golf-tracker-lambda-${AWS::AccountId}-${AWS::Region}"
-
-  GolfTrackerWebS3Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub "golf-tracker-web-${AWS::AccountId}-${AWS::Region}"
-      AccessControl: PublicRead
-      WebsiteConfiguration:
-        IndexDocument: index.html
-        ErrorDocument: error.html
-
   GolfTrackerLambdaRole:
     Type: AWS::IAM::Role
     Properties:
