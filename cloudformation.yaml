@@ -122,7 +122,7 @@ Resources:
 Outputs:
   GolfTrackerLambdaS3BucketName:
     Description: "S3 bucket for storing Lambda function code"
-    Value: !Ref GolfTrackerLambdaS3Bucket
+    Value: !Ref LambdaS3Bucket
   GolfTrackerWebS3BucketName:
     Description: "S3 bucket for hosting the golf tracker website"
     Value: !Ref GolfTrackerWebS3Bucket
