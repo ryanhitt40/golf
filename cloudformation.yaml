@@ -16,7 +16,12 @@ Resources:
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
 
- GolfTrackerWebS3Bucket:
+  GolfTrackerLambdaS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "golf-tracker-lambda-${AWS::AccountId}-${AWS::Region}"
+
+  GolfTrackerWebS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "golf-tracker-web-${AWS::AccountId}-${AWS::Region}"
@@ -99,9 +104,14 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub
-          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations"
-          - LambdaArn: !GetAtt GolfTrackerLambda.Arn
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GolfTrackerLambda.Arn}/invocations"
+
+  GolfApiGatewayPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref GolfTrackerLambda
+      Principal: apigateway.amazonaws.com
 
 Outputs:
   GolfTrackerLambdaS3BucketName:
@@ -110,3 +120,6 @@ Outputs:
   GolfTrackerWebS3BucketName:
     Description: "S3 bucket for hosting the golf tracker website"
     Value: !Ref GolfTrackerWebS3Bucket
+  GolfApiGatewayInvokeURL:
+    Description: "Invoke URL for API Gateway"
+    Value: !Sub "https://${GolfApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/score"
