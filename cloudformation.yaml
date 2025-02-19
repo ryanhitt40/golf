@@ -52,7 +52,7 @@ Resources:
       Handler: index.lambda_handler
       Role: !GetAtt GolfTrackerLambdaRole.Arn
       Code:
-        S3Bucket: YOUR_CODE_S3_BUCKET
+        S3Bucket: test-bucket-golf6543467798
         S3Key: lambda_function.zip
       Environment:
         Variables:
