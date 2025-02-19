@@ -1,4 +1,10 @@
 AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  LambdaS3Bucket:
+    Type: String
+    Description: "S3 bucket where the Lambda function package is stored"
+
 Resources:
   GolfScoresTable:
     Type: AWS::DynamoDB::Table
@@ -76,7 +82,7 @@ Resources:
       Handler: index.lambda_handler
       Role: !GetAtt GolfTrackerLambdaRole.Arn
       Code:
-        S3Bucket: !Ref GolfTrackerLambdaS3Bucket
+        S3Bucket:  !Ref LambdaS3Bucket
         S3Key: lambda_function.zip
       Environment:
         Variables:
