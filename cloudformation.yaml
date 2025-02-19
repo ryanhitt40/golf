@@ -29,16 +29,16 @@ Resources:
         IndexDocument: index.html
         ErrorDocument: error.html
 
-  GolfTrackerWebS3BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref GolfTrackerWebS3Bucket
-      PolicyDocument:
-        Statement:
-          - Effect: Allow
-            Principal: "*"
-            Action: "s3:GetObject"
-            Resource: !Sub "arn:aws:s3:::${GolfTrackerWebS3Bucket}/*"
+  # GolfTrackerWebS3BucketPolicy:
+  #   Type: AWS::S3::BucketPolicy
+  #   Properties:
+  #     Bucket: !Ref GolfTrackerWebS3Bucket
+  #     PolicyDocument:
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal: "*"
+  #           Action: "s3:GetObject"
+  #           Resource: !Sub "arn:aws:s3:::${GolfTrackerWebS3Bucket}/*"
 
   GolfTrackerLambdaRole:
     Type: AWS::IAM::Role
