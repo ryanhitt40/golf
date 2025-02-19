@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  GolfScoresTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: GolfScores
+      AttributeDefinitions:
+        - AttributeName: player
+          AttributeType: S
+        - AttributeName: hole
+          AttributeType: N
+      KeySchema:
+        - AttributeName: player
+          KeyType: HASH
+        - AttributeName: hole
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+
+  GolfTrackerLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 
+                - lambda.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: GolfTrackerLambdaPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                Resource: !GetAtt GolfScoresTable.Arn
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "arn:aws:logs:*:*:*"
+
+  GolfTrackerLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: GolfTrackerFunction
+      Runtime: python3.8
+      Handler: index.lambda_handler
+      Role: !GetAtt GolfTrackerLambdaRole.Arn
+      Code:
+        S3Bucket: YOUR_CODE_S3_BUCKET
+        S3Key: lambda_function.zip
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: GolfScores
+
+  GolfApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: GolfScoreAPI
+
+  GolfApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref GolfApiGateway
+      ParentId: !GetAtt GolfApiGateway.RootResourceId
+      PathPart: score
+
+  GolfApiMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref GolfApiGateway
+      ResourceId: !Ref GolfApiResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations"
+          - LambdaArn: !GetAtt GolfTrackerLambda.Arn
